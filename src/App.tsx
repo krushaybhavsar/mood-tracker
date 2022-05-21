@@ -44,7 +44,15 @@ const App = () => {
         <Routes>
           <Route
             path="/"
-            element={<TileScreen userLoggedIn={userLoggedIn} userID={userID} />}
+            element={
+              <TileScreen
+                userLoggedIn={userLoggedIn}
+                userID={userID}
+                setOpenModal={setOpenModal}
+                setModalContent={setModalContent}
+                openModal={openModal}
+              />
+            }
           />
           <Route
             path="/statistics"
@@ -57,6 +65,7 @@ const App = () => {
         <CustomModal
           openModal={openModal}
           setOpenModal={setOpenModal}
+          setModalContent={setModalContent}
           modalContent={modalContent}
         />
       </Router>

@@ -1,5 +1,6 @@
 .App {
-  height: 100vh;
+  height: 100%;
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
   background: var(--lightBackground);
@@ -18,4 +19,17 @@ input::-webkit-inner-spin-button {
 
 input[type="number"] {
   -moz-appearance: textfield;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--lightBackground);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--borderGrey);
+  border-radius: 100px;
 }

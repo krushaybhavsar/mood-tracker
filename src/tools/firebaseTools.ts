@@ -1,5 +1,6 @@
 import { db } from "../firebase";
-import { TileData } from "../types";
+import { TileData, TileDataList } from "../types";
+import moment from "moment";
 
 const newUserIntialData = (userID: string) => {
   return {
@@ -37,18 +38,43 @@ export const fetchUserData = async (userID: string) => {
     });
 };
 
-export const fetchUserTiles = async (userID: string) => {
+export const fetchUserTiles = async (userID: string): Promise<TileDataList> => {
+  const tileListData: any = {
+    January: [],
+    February: [],
+    March: [],
+    April: [],
+    May: [],
+    June: [],
+    July: [],
+    August: [],
+    September: [],
+    October: [],
+    November: [],
+    December: [],
+  };
   return db
     .collection("userData")
     .doc(userID)
     .collection("tiles")
     .get()
     .then(function (querySnapshot: any) {
-      const tiles: TileData[] = [];
+      let data;
+      let month = "";
       querySnapshot.forEach(function (doc: any) {
-        tiles.push({ date: doc.data().date as Date, ...doc.data() });
+        data = doc.data();
+        month = moment(data.date.toDate()).format("MMMM");
+        tileListData[month].push(data);
       });
-      return tiles;
+      // iterate through months and sort by date
+      // Object.keys(tileListData).forEach((key: string) => {
+      //   tileListData[key] = tileListData[key].sort(
+      //     (a: TileData, b: TileData) => {
+      //       return new Date(a.date).getTime() - new Date(b.date).getTime();
+      //     }
+      //   );
+      // });
+      return tileListData as TileDataList;
     });
 };
 

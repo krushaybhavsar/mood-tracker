@@ -1,0 +1,1 @@
+NLP_MODEL_PATH = './models/sentiment140-bert'

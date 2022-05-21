@@ -79,7 +79,6 @@ const LoginModalContent = (
       <div className="login-content-container">
         <div className="login-content-container-item">
           <h2 className="login-content-container-title">Phone Number</h2>
-          {/* <input type="tel" onChange={(e) => setPhoneNum(e.target.value)} /> */}
           <PhoneInput
             value={phoneNum}
             onChange={(num: string) => setPhoneNum(num)}

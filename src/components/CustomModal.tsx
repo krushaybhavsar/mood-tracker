@@ -5,6 +5,7 @@ type CustomModalProps = {
   modalContent: JSX.Element;
   openModal: boolean;
   setOpenModal: React.Dispatch<React.SetStateAction<boolean>>;
+  setModalContent: React.Dispatch<React.SetStateAction<JSX.Element>>;
 };
 
 const CustomModal = (
@@ -13,7 +14,12 @@ const CustomModal = (
   return (
     <div
       className={"modal-background" + (props.openModal ? " open" : "")}
-      onClick={() => props.setOpenModal(false)}
+      onClick={() => {
+        props.setOpenModal(false);
+        setTimeout(() => {
+          props.setModalContent(<></>);
+        }, 300);
+      }}
     >
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
         {props.modalContent}
