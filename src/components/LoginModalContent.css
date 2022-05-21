@@ -1,0 +1,83 @@
+.login-content-main-title {
+  font-size: 25px;
+  font-weight: bold;
+  margin: 0;
+}
+
+.login-content-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-top: 20px;
+  transition: all 0.5s ease;
+}
+
+.login-content-container-item {
+  width: 100%;
+  max-height: 1000px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  margin-bottom: 20px;
+  transition: all 0.5s ease;
+}
+
+.login-content-container-item.hidden {
+  opacity: 0;
+  max-height: 0;
+  margin: 0;
+}
+
+.login-content-container-title {
+  font-size: 18px;
+  font-weight: normal;
+  margin: 0;
+  margin-bottom: 6px;
+}
+
+.login-content-container-item > input,
+.PhoneInputInput {
+  width: calc(100% - 20px);
+  height: fit-content;
+  border-radius: 6px;
+  border: 1px solid var(--borderGrey);
+  padding: 6px 10px;
+  font-size: 16px;
+  font-weight: normal;
+  color: var(--textMain);
+}
+
+.login-content-container-item > input:focus,
+.PhoneInputInput:focus {
+  outline: none;
+}
+
+.login-content-container-item > button {
+  padding: 6px 20px;
+  border-radius: 8px;
+  border: 2px solid transparent;
+  color: var(--mainWhite);
+  font-size: 18px;
+  background-color: var(--primaryBlue);
+  transition: all 0.25s ease;
+  align-self: center;
+  width: 40%;
+  margin-top: 8px;
+  margin-bottom: -20px;
+  cursor: pointer;
+}
+
+.PhoneInputCountrySelectArrow {
+  display: none !important;
+}
+
+.PhoneInputCountry {
+  pointer-events: none;
+  display: none !important;
+}
+
+.PhoneInput {
+  width: 100%;
+}

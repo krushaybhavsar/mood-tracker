@@ -36,7 +36,11 @@ const App = () => {
           <Route path="*" element={<LinkNotFoundScreen />} />
           <Route exact path="/statistics" element={<StatisticsScreen />} />
         </Routes>
-        <CustomModal openModal={openModal} setOpenModal={setOpenModal} />
+        <CustomModal
+          openModal={openModal}
+          setOpenModal={setOpenModal}
+          modalContent={modalContent}
+        />
       </Router>
     </div>
   );

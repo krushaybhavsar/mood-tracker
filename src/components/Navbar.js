@@ -1,8 +1,20 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
+import { auth } from "../firebase";
+import LoginModalContent from "./LoginModalContent";
 import "./Navbar.css";
 
 const Navbar = ({ userLoggedIn, setModalContent, setOpenModal }) => {
+  const handleLoginModal = () => {
+    if (!userLoggedIn) {
+      setModalContent(<LoginModalContent setOpenModal={setOpenModal} />);
+      setOpenModal(true);
+    } else {
+      // TODO: Logout
+      auth.signOut();
+    }
+  };
+
   return (
     <div className="navbar">
       <h1 className="navbar-logo">Mood Tracker</h1>
@@ -13,7 +25,12 @@ const Navbar = ({ userLoggedIn, setModalContent, setOpenModal }) => {
         <NavLink className="navbar-link" to={"/statistics"}>
           Statistics
         </NavLink>
-        <div className="navbar-link">{userLoggedIn ? "Log out" : "Log in"}</div>
+        <button
+          className={"navbar-link btn" + (userLoggedIn ? " log-out" : " ")}
+          onClick={handleLoginModal}
+        >
+          {userLoggedIn ? "Log out" : "Log in"}
+        </button>
       </div>
     </div>
   );
