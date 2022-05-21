@@ -17,103 +17,9 @@ type TileScreenProps = {
 const TileScreen = (props: TileScreenProps): ReactElement<TileScreenProps> => {
   const [tiles, setTiles] = useState<TileDataList>({});
 
-  const dummyTiles: TileData[] = [
-    {
-      id: "1",
-      date: new Date(),
-      tileScore: 2,
-      socialRelationScore: 3,
-      personalHealthScore: 3,
-      professionScore: 5,
-      academicScore: 8,
-      familialRelationScore: 5,
-      textNote: "Hello this is a test note",
-      videoNote: "",
-    },
-    {
-      id: "2",
-      date: new Date(),
-      tileScore: 4,
-      socialRelationScore: 3,
-      personalHealthScore: 3,
-      professionScore: 5,
-      academicScore: 8,
-      familialRelationScore: 5,
-      textNote: "Hello this is a test note",
-      videoNote: "",
-    },
-    {
-      id: "3",
-      date: new Date(),
-      tileScore: 5,
-      socialRelationScore: 3,
-      personalHealthScore: 3,
-      professionScore: 5,
-      academicScore: 8,
-      familialRelationScore: 5,
-      textNote: "Hello this is a test note",
-      videoNote: "",
-    },
-    {
-      id: "4",
-      date: new Date(),
-      tileScore: 6,
-      socialRelationScore: 3,
-      personalHealthScore: 3,
-      professionScore: 5,
-      academicScore: 8,
-      familialRelationScore: 5,
-      textNote: "Hello this is a test note",
-      videoNote: "",
-    },
-    {
-      id: "5",
-      date: new Date(),
-      tileScore: 8,
-      socialRelationScore: 3,
-      personalHealthScore: 3,
-      professionScore: 5,
-      academicScore: 8,
-      familialRelationScore: 5,
-      textNote: "Hello this is a test note",
-      videoNote: "",
-    },
-    {
-      id: "6",
-      date: new Date(),
-      tileScore: 9,
-      socialRelationScore: 3,
-      personalHealthScore: 3,
-      professionScore: 5,
-      academicScore: 8,
-      familialRelationScore: 5,
-      textNote: "Hello this is a test note",
-      videoNote: "",
-    },
-  ];
-
-  const months: { [key: string]: TileData[] } = {
-    January: dummyTiles,
-    February: dummyTiles,
-    March: dummyTiles,
-    April: dummyTiles,
-    May: dummyTiles,
-    June: dummyTiles,
-    July: dummyTiles,
-    August: dummyTiles,
-    September: dummyTiles,
-    October: dummyTiles,
-    November: dummyTiles,
-    December: dummyTiles,
-  };
-
   useEffect(() => {
     loadTiles();
-  }, []);
-
-  // useEffect(() => {
-  //   loadTiles();
-  // }, [props.userLoggedIn]);
+  }, [props.userID]);
 
   const loadTiles = async () => {
     if (props.userLoggedIn && props.userID) {
@@ -129,7 +35,9 @@ const TileScreen = (props: TileScreenProps): ReactElement<TileScreenProps> => {
   };
 
   const handleAddFAB = () => {
-    props.setModalContent(<AddTileModalContent />);
+    props.setModalContent(
+      <AddTileModalContent setOpenModal={props.setOpenModal} />
+    );
     props.setOpenModal(true);
   };
 
