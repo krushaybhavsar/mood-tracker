@@ -1,25 +1,45 @@
-import logo from './logo.svg';
-import './App.css';
+import "./App.css";
+import Navbar from "./components/Navbar";
+import TileScreen from "./pages/TileScreen";
+import LinkNotFoundScreen from "./pages/LinkNotFoundScreen";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { auth } from "./firebase";
+import StatisticsScreen from "./pages/StatisticsScreen";
+import CustomModal from "./components/CustomModal";
 
-function App() {
+const App = () => {
+  const [userLoggedIn, setUserLoggedIn] = useState(false);
+  const [openModal, setOpenModal] = useState(false);
+  const [modalContent, setModalContent] = useState(<div></div>);
+
+  useEffect(() => {
+    auth.onAuthStateChanged((user) => {
+      if (user) {
+        setUserLoggedIn(true);
+      } else {
+        setUserLoggedIn(false);
+      }
+    });
+  }, []);
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <Router>
+        <Navbar
+          userLoggedIn={userLoggedIn}
+          setModalContent={setModalContent}
+          setOpenModal={setOpenModal}
+        />
+        <Routes>
+          <Route exact path="/" element={<TileScreen />} />
+          <Route path="*" element={<LinkNotFoundScreen />} />
+          <Route exact path="/statistics" element={<StatisticsScreen />} />
+        </Routes>
+        <CustomModal openModal={openModal} setOpenModal={setOpenModal} />
+      </Router>
     </div>
   );
-}
+};
 
 export default App;
