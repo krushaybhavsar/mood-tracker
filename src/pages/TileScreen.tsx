@@ -1,14 +1,21 @@
 import React, { useEffect, useState } from "react";
+import { ReactElement } from "react";
 import MoodTile from "../components/MoodTile";
 import { fetchUserTiles } from "../tools/firebaseTools";
+import { TileData } from "../types";
 import "./TileScreen.css";
 
-const TileScreen = ({ userLoggedIn, userID }) => {
-  const [tiles, setTiles] = useState([]);
+type TileScreenProps = {
+  userLoggedIn: boolean;
+  userID: string | undefined;
+};
+
+const TileScreen = (props: TileScreenProps): ReactElement<TileScreenProps> => {
+  const [tiles, setTiles] = useState<TileData[]>([]);
 
   useEffect(() => {
-    if (userLoggedIn && userID) {
-      fetchUserTiles(userID)
+    if (props.userLoggedIn && props.userID) {
+      fetchUserTiles(props.userID)
         .then((data) => {
           console.log(data);
           setTiles(data);
@@ -17,11 +24,11 @@ const TileScreen = ({ userLoggedIn, userID }) => {
           console.log(error);
         });
     }
-  }, [userLoggedIn]);
+  }, [props.userLoggedIn]);
 
   return (
     <div className="tile-screen">
-      {userLoggedIn ? (
+      {props.userLoggedIn ? (
         <div className="tile-container">{/* <MoodTile score={} /> */}</div>
       ) : (
         <div className="screen-login">

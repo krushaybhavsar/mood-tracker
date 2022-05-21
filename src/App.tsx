@@ -21,7 +21,7 @@ const App = () => {
         setUserLoggedIn(true);
         fetchUserData(user.uid)
           .then((data) => {
-            setUserID(data.userID);
+            setUserID(data?.userID);
             console.log(data);
           })
           .catch((error) => {
@@ -43,12 +43,10 @@ const App = () => {
         />
         <Routes>
           <Route
-            exact
             path="/"
             element={<TileScreen userLoggedIn={userLoggedIn} userID={userID} />}
           />
           <Route
-            exact
             path="/statistics"
             element={
               <StatisticsScreen userLoggedIn={userLoggedIn} userID={userID} />

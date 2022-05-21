@@ -1,11 +1,17 @@
-import React, { useState } from "react";
+import React, { ReactElement, useState } from "react";
 import "./LoginModalContent.css";
 import { app, auth } from "../firebase";
 import firebase from "firebase";
 import "react-phone-number-input/style.css";
 import PhoneInput from "react-phone-number-input";
 
-const LoginModalContent = ({ setOpenModal }) => {
+type LoginModalContentProps = {
+  setOpenModal: React.Dispatch<React.SetStateAction<boolean>>;
+};
+
+const LoginModalContent = (
+  props: LoginModalContentProps
+): ReactElement<LoginModalContentProps> => {
   const [otpSent, setOtpSent] = useState(false);
   const [phoneNum, setPhoneNum] = useState("");
   const [otpNum, setOtpNum] = useState("");
@@ -15,9 +21,9 @@ const LoginModalContent = ({ setOpenModal }) => {
     if (!otpSent) {
       generateReCAPTCHA();
       auth
-        .signInWithPhoneNumber(phoneNum, window.recaptchaVerifier)
+        .signInWithPhoneNumber(phoneNum, (window as any).recaptchaVerifier)
         .then((confirmationResult) => {
-          window.confirmationResult = confirmationResult;
+          (window as any).confirmationResult = confirmationResult;
           setOtpSent(true);
         })
         .catch((error) => {
@@ -30,11 +36,11 @@ const LoginModalContent = ({ setOpenModal }) => {
   };
 
   const generateReCAPTCHA = () => {
-    window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier(
+    (window as any).recaptchaVerifier = new firebase.auth.RecaptchaVerifier(
       "recaptcha-container",
       {
         size: "invisible",
-        callback: function (response) {},
+        callback: function () {},
       },
       app
     );
@@ -42,13 +48,13 @@ const LoginModalContent = ({ setOpenModal }) => {
 
   const verifyOTP = () => {
     if (otpNum.length === 6) {
-      window.confirmationResult
+      (window as any).confirmationResult
         .confirm(otpNum)
-        .then((result) => {
+        .then(() => {
           console.log("Logged in successfully");
-          setOpenModal(false);
+          props.setOpenModal(false);
         })
-        .catch((error) => {
+        .catch((error: any) => {
           console.log(error);
         });
     }
@@ -74,7 +80,10 @@ const LoginModalContent = ({ setOpenModal }) => {
         <div className="login-content-container-item">
           <h2 className="login-content-container-title">Phone Number</h2>
           {/* <input type="tel" onChange={(e) => setPhoneNum(e.target.value)} /> */}
-          <PhoneInput value={phoneNum} onChange={(e) => setPhoneNum(e)} />
+          <PhoneInput
+            value={phoneNum}
+            onChange={(num: string) => setPhoneNum(num)}
+          />
         </div>
         <div
           className={

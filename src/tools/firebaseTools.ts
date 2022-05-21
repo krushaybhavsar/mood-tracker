@@ -1,6 +1,7 @@
 import { db } from "../firebase";
+import { TileData } from "../types";
 
-const newUserIntialData = (userID) => {
+const newUserIntialData = (userID: string) => {
   return {
     userID: userID,
     socialRelationScore: 0,
@@ -11,12 +12,12 @@ const newUserIntialData = (userID) => {
   };
 };
 
-export const fetchUserData = async (userID) => {
+export const fetchUserData = async (userID: string) => {
   return db
     .collection("userData")
     .doc(userID)
     .get()
-    .then(function (doc) {
+    .then(function (doc: any) {
       if (doc.exists) {
         // returning user --> fetch data
         return doc.data();
@@ -29,49 +30,35 @@ export const fetchUserData = async (userID) => {
           .then(function () {
             return newUserIntialData(userID);
           })
-          .catch(function (error) {
+          .catch(function (error: any) {
             console.error("Error writing document: ", error);
           });
       }
     });
 };
 
-export const fetchUserTiles = async (userID) => {
+export const fetchUserTiles = async (userID: string) => {
   return db
     .collection("userData")
     .doc(userID)
     .collection("tiles")
     .get()
-    .then(function (querySnapshot) {
-      const tiles = [];
-      querySnapshot.forEach(function (doc) {
-        tiles.push({ date: doc.data().date.toDate(), ...doc.data() });
+    .then(function (querySnapshot: any) {
+      const tiles: TileData[] = [];
+      querySnapshot.forEach(function (doc: any) {
+        tiles.push({ date: doc.data().date as Date, ...doc.data() });
       });
       return tiles;
     });
 };
 
-export const addUserTile = async (userID, tileData) => {
+export const addUserTile = async (userID: string, tileData: TileData) => {
   return db
     .collection("userData")
     .doc(userID)
     .collection("tiles")
     .add(tileData)
-    .then(function (docRef) {
+    .then(function (docRef: any) {
       return docRef.id;
     });
 };
-
-/*
-tileData = {
-    id: "dsjksjfk",
-    date: 2020-01-01,
-    socialRelationScore: 0,
-    personalHealthScore: 0,
-    professionScore: 0,
-    academicScore: 0,
-    familialRelationScore: 0,
-    textNote: "I am very sad today",
-    videoNote: "[reference to firebase storage link]",
-}
-*/

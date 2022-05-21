@@ -1,10 +1,18 @@
 import React from "react";
+import { ReactElement } from "react";
 import "./StatisticsScreen.css";
 
-const StatisticsScreen = ({ userLoggedIn, userID }) => {
+type StatisticsScreenProps = {
+  userLoggedIn: boolean;
+  userID: string | undefined;
+};
+
+const StatisticsScreen = (
+  props: StatisticsScreenProps
+): ReactElement<StatisticsScreenProps> => {
   return (
     <div className="statistics-screen">
-      {userLoggedIn ? (
+      {props.userLoggedIn ? (
         <div className="stat-container"></div>
       ) : (
         <div className="screen-login">
