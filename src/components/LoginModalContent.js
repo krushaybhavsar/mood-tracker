@@ -13,20 +13,17 @@ const LoginModalContent = ({ setOpenModal }) => {
   const handleButtonClick = () => {
     console.log(phoneNum);
     if (!otpSent) {
-      if (phoneNum !== "" && phoneNum.length >= 10) {
-        // generateReCAPTCHA();
-        // auth
-        //   .signInWithPhoneNumber(phoneNum, window.recaptchaVerifier)
-        //   .then((confirmationResult) => {
-        //     window.confirmationResult = confirmationResult;
-        //     setOtpSent(true);
-        //   })
-        //   .catch((error) => {
-        //     console.log(error);
-        //   });
-      } else {
-        console.log("Phone number is invalid");
-      }
+      generateReCAPTCHA();
+      auth
+        .signInWithPhoneNumber(phoneNum, window.recaptchaVerifier)
+        .then((confirmationResult) => {
+          window.confirmationResult = confirmationResult;
+          setOtpSent(true);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+      setOtpSent(true);
     } else {
       verifyOTP();
     }
@@ -57,6 +54,19 @@ const LoginModalContent = ({ setOpenModal }) => {
     }
   };
 
+  const checkValidInput = () => {
+    if (otpSent) {
+      return !(
+        otpNum &&
+        otpNum !== "" &&
+        otpNum.length === 6 &&
+        otpNum.match(/^[0-9]+$/)
+      );
+    } else {
+      return !(phoneNum && phoneNum !== "" && phoneNum.length === 12);
+    }
+  };
+
   return (
     <>
       <h1 className="login-content-main-title">Login with Phone Number</h1>
@@ -73,15 +83,14 @@ const LoginModalContent = ({ setOpenModal }) => {
         >
           <h2 className="login-content-container-title">OTP Pin</h2>
           <input
-            type="number"
+            type="text"
             maxLength={6}
-            value={otpNum}
             onChange={(e) => setOtpNum(e.target.value)}
           />
         </div>
         <div className="login-content-container-item">
           <div id="recaptcha-container" style={{ display: "none" }}></div>
-          <button onClick={handleButtonClick}>
+          <button onClick={handleButtonClick} disabled={checkValidInput()}>
             {otpSent ? "Login" : "Send OTP"}
           </button>
         </div>

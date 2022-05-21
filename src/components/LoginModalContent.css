@@ -28,6 +28,8 @@
   opacity: 0;
   max-height: 0;
   margin: 0;
+  padding: 0;
+  pointer-events: none;
 }
 
 .login-content-container-title {
@@ -67,6 +69,10 @@
   margin-top: 8px;
   margin-bottom: -20px;
   cursor: pointer;
+}
+
+.login-content-container-item > button:disabled {
+  opacity: 0.5;
 }
 
 .PhoneInputCountrySelectArrow {

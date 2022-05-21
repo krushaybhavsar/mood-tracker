@@ -17,10 +17,10 @@ const Navbar = ({ userLoggedIn, setModalContent, setOpenModal }) => {
 
   return (
     <div className="navbar">
-      <h1 className="navbar-logo">Mood Tracker</h1>
+      <h1 className="navbar-logo">Mind Board</h1>
       <div className="navbar-link-container">
         <NavLink className="navbar-link" to={"/"}>
-          Tile Grid
+          My Board
         </NavLink>
         <NavLink className="navbar-link" to={"/statistics"}>
           Statistics

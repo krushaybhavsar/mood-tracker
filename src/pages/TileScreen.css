@@ -1,0 +1,22 @@
+.tile-screen {
+  width: 100%;
+  height: 100%;
+}
+
+.screen-login {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.screen-login > h1 {
+  font-weight: 400;
+  width: 60vw;
+  text-align: center;
+}
+
+.tile-container {
+}
