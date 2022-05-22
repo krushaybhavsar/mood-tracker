@@ -80,23 +80,36 @@ export const fetchUserTiles = async (userID: string): Promise<TileDataList> => {
 export const addUserTile = async (userID: string, tileData: TileDataRaw) => {
   // if tiledata.noteType is video, then upload video to storage
   if (tileData.noteType === "video") {
-    const videoRef = storage.ref(`${userID}/${tileData.date}`);
-    const videoURL = await videoRef.putString(tileData.videoNote, "data_url");
-    tileData.videoNote = await videoURL.ref.getDownloadURL();
-    console.log("videoURL", tileData.videoNote);
-    // firebaseVideoURLtoScore(tileData.videoNote)
-    //   .then(async (score: number) => {
-    //     tileData.tileScore = score;
-    //     await db
-    //       .collection("userData")
-    //       .doc(userID)
-    //       .collection("tiles")
-    //       .add(tileData)
-    //       .then(function (docRef: any) {
-    //         return docRef.id;
-    //       });
-    //   })
-    //   .catch(() => {});
+    getFileBlob(tileData.videoNote, async (blob: any) => {
+      await storage
+        .ref(`${userID}/${tileData.date}`)
+        .put(blob)
+        .then(async function (snapshot) {
+          await storage
+            .ref(`${userID}/${tileData.date}`)
+            .getDownloadURL()
+            .then(function (url: string) {
+              //  get url here
+              tileData.videoNote = url;
+              firebaseVideoURLtoScore(url)
+                .then(async (score: number) => {
+                  tileData.tileScore = score;
+                  await db
+                    .collection("userData")
+                    .doc(userID)
+                    .collection("tiles")
+                    .add(tileData)
+                    .then(function (docRef: any) {
+                      return docRef.id;
+                    });
+                })
+                .catch(() => {});
+            })
+            .catch(function (error: any) {
+              console.log(error);
+            });
+        });
+    });
   } else {
     await textToScore(tileData.textNote)
       .then(async (score: number) => {
@@ -115,3 +128,16 @@ export const addUserTile = async (userID: string, tileData: TileDataRaw) => {
       });
   }
 };
+
+var getFileBlob = function (url: string, cb: any) {
+  var xhr = new XMLHttpRequest();
+  xhr.open("GET", url);
+  xhr.responseType = "blob";
+  xhr.addEventListener("load", function () {
+    let url = cb(xhr.response);
+    console.log(url);
+  });
+  xhr.send();
+};
+
+const uploadToStorage = async (imageURL: string, path: string) => {};
