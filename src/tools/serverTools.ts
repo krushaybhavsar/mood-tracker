@@ -1,8 +1,9 @@
-export const firebaseVideoURLtoScore = async (url: string): Promise<number> => {
+export const firebaseVideoURLtoScore = async (url: string, transcript: string): Promise<number> => {
   let aiScore = await fetch("/api/scoreVideo", {
     method: "POST",
     body: JSON.stringify({
       url: url,
+      transcript: transcript,
     }),
   }).then(async (response) => {
     return response.json().then((data) => {

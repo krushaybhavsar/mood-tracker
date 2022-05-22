@@ -28,7 +28,7 @@ headers = {
 }
 
 @app.route('/api/scoreText', methods=['POST'])
-def generate_health_score():
+def generate_text_score():
     request_data = json.loads(request.data)
     sentence = tf.constant([request_data['text']])
     prediction = tf.sigmoid(nlp_model(sentence))
@@ -40,8 +40,13 @@ def generate_video_score():
     global video_scores
     request_data = json.loads(request.data)
     video_url = request_data['url']
+    text = request_data['transcript']
 
     video = cv2.VideoCapture(video_url)
+    
+    sentence = tf.constant([text])
+    text_prediction = tf.sigmoid(nlp_model(sentence))
+    text_score = max(text_prediction.numpy()[0][0], 0)
 
     while True:
         ret, frame = video.read()
@@ -69,74 +74,4 @@ def generate_video_score():
 
     video_scores = []
 
-    return {"score": str(round(video_score, 2))}
-
-@app.route('/api/scoreAudio', methods=['POST'])
-def generate_audio_score(audio):
-
-    # NOT SURE HOW THIS WORKS WITH AUDIO MAYBE JUST RECEIVE DATA AND DO THE WHILE TRUE
-    file = '/path/to/your/audio/file.mp3'
-    
-    upload_link = 'https://api.assemblyai.com/v2/upload'
-
-    def read_audio_file(file):
-        """Helper method that reads in audio files"""
-        with open(file, 'rb') as f:
-            while True:
-                data = f.read(5242880)
-                if not data:
-                    break
-                yield data
-
-    res_upload = requests.post(
-        upload_link, 
-        headers=headers, 
-        data=read_audio_file(file)
-    )
-
-    upload_url = res_upload.json()['upload_url']
-
-    transcript_link = 'https://api.assemblyai.com/v2/transcript'
-
-    response = requests.post(
-        transcript_link,
-        headers=headers,
-        json={
-            'audio_url': upload_url,
-            'sentiment_analysis': True
-        }, 
-    )
-    
-    response_json = response.json()
-
-    print(response_json)
-
-    return reponse_json
-
-@app.route('/api/scoreAudio2', methods=['POST'])
-def generate_audio_score2():
-
-    request_data = json.loads(request.data)
-    video_url = request_data['url']
-
-    endpoint = "https://api.assemblyai.com/v2/transcript"
-    json_dict = {
-        "audio_url": video_url,
-    }
-
-    headers = {
-        "authorization": ASSEMBLYAI_API_KEY,
-        "content-type": "application/json",
-    }
-    
-    response = requests.post(endpoint, json=json_dict, headers=headers)
-    print(response.json())
-
-    endpoint = "https://api.assemblyai.com/v2/transcript/" + response.json()['id']
-    headers = {
-        "authorization": ASSEMBLYAI_API_KEY,
-    }
-    response = requests.get(endpoint, headers=headers)
-    print(response.json())
-
-    return response.json()
+    return {"score": str(round(video_score + text_score, 2))}

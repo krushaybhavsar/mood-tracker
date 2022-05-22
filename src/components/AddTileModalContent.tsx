@@ -6,6 +6,9 @@ import { storage, db } from "../firebase";
 import { firebaseVideoURLtoScore, textToScore } from "../tools/serverTools";
 import { NoteType, TileDataRaw } from "../types";
 import "./AddTileModalContent.css";
+import SpeechRecognition, {
+  useSpeechRecognition,
+} from "react-speech-recognition";
 
 type AddTileModalContentProps = {
   setOpenModal: React.Dispatch<React.SetStateAction<boolean>>;
@@ -54,6 +57,15 @@ const AddTileModalContent = (
     "Academics",
     "Family",
   ];
+
+  
+  const {
+    transcript,
+    listening,
+    resetTranscript,
+    browserSupportsSpeechRecognition,
+  } = useSpeechRecognition();
+
   const [selectedMood, setSelectedMood] = useState<number>(-1);
   const [selectedReason, setSelectedReason] = useState<number>(-1);
   const [stepNum, setStepNum] = useState<number>(1);
@@ -76,18 +88,10 @@ const AddTileModalContent = (
           videoNote: videoStream ? videoStream : "",
           noteType: notesMethod,
         };
-        await addUserTile(props.userID, data)
-          .then((id) => {
-            console.log("Tile added: " + id);
-            props.setAddTileRefresher(props.addTileRefresher + 1);
-            props.setOpenModal(false);
-            setTimeout(() => {
-              props.setModalContent(<></>);
-            }, 300);
-          })
-          .catch((error) => {
-            console.log(error);
-          });
+        await addUserTile(props.userID, data).catch((error) => {
+          console.log(error);
+        });
+        resetTranscript();
       }
     }
   };
@@ -106,9 +110,9 @@ const AddTileModalContent = (
               .getDownloadURL()
               .then(async function (url: string) {
                 tileData.videoNote = url;
-                await firebaseVideoURLtoScore(url)
+                await firebaseVideoURLtoScore(url, transcript)
                   .then(async (score: number) => {
-                    tileData.tileScore = (tileData.tileScore + score) / 2;
+                    tileData.tileScore = (tileData.tileScore + score) / 3;
                     await db
                       .collection("userData")
                       .doc(userID)
@@ -117,6 +121,11 @@ const AddTileModalContent = (
                       .then(function (docRef: any) {
                         console.log("Tile added with ID: ", docRef.id);
                         setLoading(false);
+                        props.setAddTileRefresher(props.addTileRefresher + 1);
+                        props.setOpenModal(false);
+                        setTimeout(() => {
+                          props.setModalContent(<></>);
+                        }, 300);
                       });
                   })
                   .catch(() => {});
@@ -140,6 +149,11 @@ const AddTileModalContent = (
             .then(function (docRef: any) {
               console.log("Tile added with ID: ", docRef.id);
               setLoading(false);
+              props.setAddTileRefresher(props.addTileRefresher + 1);
+              props.setOpenModal(false);
+              setTimeout(() => {
+                props.setModalContent(<></>);
+              }, 300);
             });
         })
         .catch((error: any) => {
@@ -308,9 +322,11 @@ const AddTileModalContent = (
                           if (!isRecording) {
                             startRecording();
                             setIsRecording(true);
+                            SpeechRecognition.startListening();
                           } else {
                             stopRecording();
                             setIsRecording(false);
+                            SpeechRecognition.stopListening();
                           }
                         }}
                       >

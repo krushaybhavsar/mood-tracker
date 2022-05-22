@@ -32,7 +32,31 @@ const MoodTile = (props: MoodTileProps): ReactElement<MoodTileProps> => {
   };
 
   const getModalContent = () => {
-    return <div>{props.data.tileScore}</div>;
+    console.log(props.data);
+    return (
+      <div className="mood-tile-modal-content">
+        <h1>{moment(props.data.date).format("MMMM Do YYYY")}</h1>
+        <h2>Category: {props.data.category}</h2>
+        <h2 className="mood-tile-score">
+          Score: {Math.round(props.data.tileScore * 100) / 100}
+        </h2>
+        {props.data.noteType === "text" ? (
+            <h3>{props.data.textNote}</h3>
+        ) : (
+          <div className="nt-content-video-options">
+            <video
+              src={props.data.videoNote}
+              controls
+              autoPlay
+              loop
+              className="nt-content-video"
+              width={350}
+              height={200}
+            />
+          </div>
+        )}
+      </div>
+    );
   };
 
   return (
