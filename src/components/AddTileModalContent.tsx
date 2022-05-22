@@ -1,7 +1,9 @@
 import React, { useEffect, useRef, useState } from "react";
 import { ReactElement } from "react";
 import { ReactMediaRecorder, StatusMessages } from "react-media-recorder";
-import { addUserTile } from "../tools/firebaseTools";
+// import { addUserTile } from "../tools/firebaseTools";
+import { storage, db } from "../firebase";
+import { firebaseVideoURLtoScore, textToScore } from "../tools/serverTools";
 import { NoteType, TileDataRaw } from "../types";
 import "./AddTileModalContent.css";
 
@@ -59,8 +61,9 @@ const AddTileModalContent = (
   const [isRecording, setIsRecording] = useState<boolean>(false);
   const [videoStream, setVideoStream] = useState<string | undefined>();
   const [textNotes, setTextNotes] = useState<string>("");
+  const [loading, setLoading] = useState(false);
 
-  const handleButton = () => {
+  const handleButton = async () => {
     if (stepNum === 1) {
       setStepNum(2);
     } else {
@@ -73,7 +76,7 @@ const AddTileModalContent = (
           videoNote: videoStream ? videoStream : "",
           noteType: notesMethod,
         };
-        addUserTile(props.userID, data)
+        await addUserTile(props.userID, data)
           .then((id) => {
             console.log("Tile added: " + id);
             props.setAddTileRefresher(props.addTileRefresher + 1);
@@ -89,19 +92,88 @@ const AddTileModalContent = (
     }
   };
 
-  const checkValidInput = () => {
-    if (stepNum === 1) {
-      if (selectedMood !== -1 && selectedReason !== -1) {
-        return true;
-      }
-      return false;
+  const addUserTile = async (userID: string, tileData: TileDataRaw) => {
+    // if tiledata.noteType is video, then upload video to storage
+    setLoading(true);
+    if (tileData.noteType === "video") {
+      await getFileBlob(tileData.videoNote, async (blob: any) => {
+        await storage
+          .ref(`${userID}/${tileData.date}`)
+          .put(blob)
+          .then(async function () {
+            await storage
+              .ref(`${userID}/${tileData.date}`)
+              .getDownloadURL()
+              .then(async function (url: string) {
+                tileData.videoNote = url;
+                await firebaseVideoURLtoScore(url)
+                  .then(async (score: number) => {
+                    tileData.tileScore = (tileData.tileScore + score) / 2;
+                    await db
+                      .collection("userData")
+                      .doc(userID)
+                      .collection("tiles")
+                      .add(tileData)
+                      .then(function (docRef: any) {
+                        console.log("Tile added with ID: ", docRef.id);
+                        setLoading(false);
+                      });
+                  })
+                  .catch(() => {});
+              })
+              .catch(function (error: any) {
+                console.log(error);
+              });
+          });
+      }).catch((e) => {
+        console.log(e);
+      });
     } else {
-      if (notesMethod === "text") {
-        return textNotes !== "";
+      await textToScore(tileData.textNote)
+        .then(async (score: number) => {
+          tileData.tileScore = (tileData.tileScore + score) / 2;
+          await db
+            .collection("userData")
+            .doc(userID)
+            .collection("tiles")
+            .add(tileData)
+            .then(function (docRef: any) {
+              console.log("Tile added with ID: ", docRef.id);
+              setLoading(false);
+            });
+        })
+        .catch((error: any) => {
+          console.log("error", error);
+        });
+    }
+  };
+
+  var getFileBlob = async function (url: string, cb: any) {
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET", url);
+    xhr.responseType = "blob";
+    xhr.addEventListener("load", function () {
+      cb(xhr.response);
+    });
+    xhr.send();
+  };
+
+  const checkValidInput = () => {
+    if (!loading) {
+      if (stepNum === 1) {
+        if (selectedMood !== -1 && selectedReason !== -1) {
+          return true;
+        }
+        return false;
       } else {
-        return videoStream;
+        if (notesMethod === "text") {
+          return textNotes !== "";
+        } else {
+          return videoStream;
+        }
       }
     }
+    return false;
   };
 
   const getStep1Content = () => {
@@ -116,12 +188,11 @@ const AddTileModalContent = (
               <img
                 key={index}
                 className={
-                  "mood-image" +
-                  (index === selectedMood / 2 - 1 ? " selected" : "")
+                  "mood-image" + (index === selectedMood / 2 ? " selected" : "")
                 }
                 src={require(`../assets/${image}`)}
                 alt="mood"
-                onClick={() => setSelectedMood((images.indexOf(image) + 1) * 2)}
+                onClick={() => setSelectedMood(images.indexOf(image) * 2)}
               />
             ))}
           </div>
@@ -268,7 +339,7 @@ const AddTileModalContent = (
         {stepNum === 1 ? getStep1Content() : getStep2Content()}
         <div className="nt-content-container-item">
           <button onClick={handleButton} disabled={!checkValidInput()}>
-            {stepNum === 1 ? "Next" : "Add Tile"}
+            {loading ? "Uploading..." : stepNum === 1 ? "Next" : "Add Tile"}
           </button>
         </div>
       </div>

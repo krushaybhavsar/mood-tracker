@@ -22,7 +22,6 @@ const App = () => {
         fetchUserData(user.uid)
           .then((data) => {
             setUserID(data?.userID);
-            console.log(data);
           })
           .catch((error) => {
             console.log(error);

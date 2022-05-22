@@ -14,7 +14,16 @@ const MoodTile = (props: MoodTileProps): ReactElement<MoodTileProps> => {
   const colors = ["#ec2128", "#f35928", "#fcb03a", "#009348", "#21abe3"];
   const getBackgroundColor = (): string => {
     const { tileScore } = props.data;
-    return colors[tileScore / 2 - 1];
+    if (Math.round(tileScore) <= 2) {
+      return colors[0];
+    } else if (Math.round(tileScore) < 5) {
+      return colors[1];
+    } else if (Math.round(tileScore) < 7) {
+      return colors[2];
+    } else if (Math.round(tileScore) < 9) {
+      return colors[3];
+    }
+    return colors[4];
   };
 
   const handleTileClick = () => {
@@ -32,7 +41,7 @@ const MoodTile = (props: MoodTileProps): ReactElement<MoodTileProps> => {
       onClick={handleTileClick}
       style={{ backgroundColor: getBackgroundColor() }}
     >
-      {props.data.tileScore}
+      {Math.round(props.data.tileScore)}
       {/* {moment(props.data.date).format("D")} */}
     </div>
   );
