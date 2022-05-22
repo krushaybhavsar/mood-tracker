@@ -6,6 +6,7 @@ from PIL import Image
 import numpy as np
 from constants import *
 import tensorflow as tf
+import tensorflow_text as text
 import io
 import re
 from deepface import DeepFace
@@ -27,14 +28,14 @@ headers = {
 }
 
 @app.route('/api/scoreText', methods=['POST'])
-def generate_health_score(text):
+def generate_health_score():
     request_data = json.loads(request.data)
-    sentence = tf.constant(request_data['text'])
-    prediction = nlp_model(sentence)
-    return prediction # 0 is sad 1 is happy
+    sentence = tf.constant([request_data['text']])
+    prediction = tf.sigmoid(nlp_model(sentence))
+    return {'score': str(prediction.numpy()[0][0])} # 0 is sad 1 is happy
 
 @app.route('/api/scoreVideo', methods=['POST'])
-def generate_video_score(image):
+def generate_video_score():
     global video_scores
     request_data = json.loads(request.data)
     video_url = request_data['url']
@@ -48,13 +49,16 @@ def generate_video_score(image):
     # imgdata = base64.b64decode(image_data)
     # image = Image.open(io.BytesIO(imgdata))
     # image = np.array(image)
-        obj = DeepFace.analyze(frame, actions = ['emotion'], models={'emotion': emotion_model}, enforce_detection=False, detector_backend='ssd')
-        box = obj['region']
-        emotion = obj['dominant_emotion']
-        confidence = obj['emotion'][emotion]
-        adjusted_scores = [emotion_labels[feeling] * obj['emotion'][feeling] / 100 for feeling in emotion_labels]
-        score = sum(adjusted_scores)
-        video_scores.append(score)
+        if frame is not None:
+            obj = DeepFace.analyze(frame, actions = ['emotion'], models={'emotion': emotion_model}, enforce_detection=False, detector_backend='ssd')
+            box = obj['region']
+            emotion = obj['dominant_emotion']
+            confidence = obj['emotion'][emotion]
+            adjusted_scores = [emotion_labels[feeling] * obj['emotion'][feeling] / 100 for feeling in emotion_labels]
+            score = sum(adjusted_scores)
+            video_scores.append(score)
+        else:
+            break
     
     video_score = video_scores / len(video_scores)
 
@@ -101,3 +105,25 @@ def generate_audio_score(audio):
     response_json = response.json()
 
     print(response_json)
+
+def generate_audio_score2():
+    endpoint = "https://api.assemblyai.com/v2/transcript"
+    json = {
+        "audio_url": "https://bit.ly/3yxKEIY"
+    }
+    headers = {
+        "authorization": ASSEMBLYAI_API_KEY,
+        "content-type": "application/json",
+    }
+    
+    response = requests.post(endpoint, json=json, headers=headers)
+    print(response.json())
+
+    endpoint = "https://api.assemblyai.com/v2/transcript/" + response.json()['id']
+    headers = {
+        "authorization": ASSEMBLYAI_API_KEY,
+    }
+    response = requests.get(endpoint, headers=headers)
+    print(response.json())
+
+    return response.json()

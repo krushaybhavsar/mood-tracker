@@ -1,2 +1,2 @@
-NLP_MODEL_PATH = './models/sentiment140-bert'
+NLP_MODEL_PATH = './models/sentiment140_bert_en_uncased_L-4_H-512_A-8'
 ASSEMBLYAI_API_KEY = 'ef7c3695938846769b135bb3757d9367'
