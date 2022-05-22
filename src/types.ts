@@ -1,14 +1,21 @@
+export type NoteType = "text" | "video";
+
 export type TileData = {
-  id: string;
   date: Date;
   tileScore: number;
-  socialRelationScore: number;
-  personalHealthScore: number;
-  professionScore: number;
-  academicScore: number;
-  familialRelationScore: number;
+  category: string;
   textNote: string;
   videoNote: string;
+  noteType: NoteType;
+};
+
+export type TileDataRaw = {
+  date: string;
+  tileScore: number;
+  category: string;
+  textNote: string;
+  videoNote: string;
+  noteType: NoteType;
 };
 
 export type Month =

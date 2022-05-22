@@ -15,7 +15,10 @@ const Navbar = (props: NavbarProps): ReactElement<NavbarProps> => {
   const handleLoginModal = () => {
     if (!props.userLoggedIn) {
       props.setModalContent(
-        <LoginModalContent setOpenModal={props.setOpenModal} />
+        <LoginModalContent
+          setOpenModal={props.setOpenModal}
+          setModalContent={props.setModalContent}
+        />
       );
       props.setOpenModal(true);
     } else {

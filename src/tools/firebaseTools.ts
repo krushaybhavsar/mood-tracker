@@ -1,6 +1,7 @@
-import { db } from "../firebase";
-import { TileData, TileDataList } from "../types";
+import { db, storage } from "../firebase";
+import { TileData, TileDataList, TileDataRaw } from "../types";
 import moment from "moment";
+import { firebaseVideoURLtoScore, textToScore } from "./serverTools";
 
 const newUserIntialData = (userID: string) => {
   return {
@@ -63,28 +64,54 @@ export const fetchUserTiles = async (userID: string): Promise<TileDataList> => {
       let month = "";
       querySnapshot.forEach(function (doc: any) {
         data = doc.data();
-        month = moment(data.date.toDate()).format("MMMM");
-        tileListData[month].push(data);
+        month = moment(data.date).format("MMMM");
+        tileListData[month].push({ date: new Date(data.date), ...data });
       });
-      // iterate through months and sort by date
-      // Object.keys(tileListData).forEach((key: string) => {
-      //   tileListData[key] = tileListData[key].sort(
-      //     (a: TileData, b: TileData) => {
-      //       return new Date(a.date).getTime() - new Date(b.date).getTime();
-      //     }
-      //   );
-      // });
+      // iterate through months and sort by date using moment
+      Object.keys(tileListData).forEach((key: string) => {
+        tileListData[key] = tileListData[key].sort((a: TileData, b: TileData) =>
+          moment(a.date).isBefore(b.date) ? -1 : 1
+        );
+      });
       return tileListData as TileDataList;
     });
 };
 
-export const addUserTile = async (userID: string, tileData: TileData) => {
-  return db
-    .collection("userData")
-    .doc(userID)
-    .collection("tiles")
-    .add(tileData)
-    .then(function (docRef: any) {
-      return docRef.id;
-    });
+export const addUserTile = async (userID: string, tileData: TileDataRaw) => {
+  // if tiledata.noteType is video, then upload video to storage
+  if (tileData.noteType === "video") {
+    const videoRef = storage.ref(`${userID}/${tileData.date}`);
+    const videoURL = await videoRef.putString(tileData.videoNote, "data_url");
+    tileData.videoNote = await videoURL.ref.getDownloadURL();
+    console.log("videoURL", tileData.videoNote);
+    // firebaseVideoURLtoScore(tileData.videoNote)
+    //   .then(async (score: number) => {
+    //     tileData.tileScore = score;
+    //     await db
+    //       .collection("userData")
+    //       .doc(userID)
+    //       .collection("tiles")
+    //       .add(tileData)
+    //       .then(function (docRef: any) {
+    //         return docRef.id;
+    //       });
+    //   })
+    //   .catch(() => {});
+  } else {
+    await textToScore(tileData.textNote)
+      .then(async (score: number) => {
+        tileData.tileScore = score;
+        await db
+          .collection("userData")
+          .doc(userID)
+          .collection("tiles")
+          .add(tileData)
+          .then(function (docRef: any) {
+            return docRef.id;
+          });
+      })
+      .catch((error: any) => {
+        console.log("error", error);
+      });
+  }
 };

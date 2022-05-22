@@ -16,10 +16,11 @@ type TileScreenProps = {
 
 const TileScreen = (props: TileScreenProps): ReactElement<TileScreenProps> => {
   const [tiles, setTiles] = useState<TileDataList>({});
+  const [addTileRefresher, setAddTileRefresher] = useState<number>(0);
 
   useEffect(() => {
     loadTiles();
-  }, [props.userID]);
+  }, [props.userID, addTileRefresher]);
 
   const loadTiles = async () => {
     if (props.userLoggedIn && props.userID) {
@@ -36,7 +37,13 @@ const TileScreen = (props: TileScreenProps): ReactElement<TileScreenProps> => {
 
   const handleAddFAB = () => {
     props.setModalContent(
-      <AddTileModalContent setOpenModal={props.setOpenModal} />
+      <AddTileModalContent
+        setOpenModal={props.setOpenModal}
+        setAddTileRefresher={setAddTileRefresher}
+        addTileRefresher={addTileRefresher}
+        setModalContent={props.setModalContent}
+        userID={props.userID}
+      />
     );
     props.setOpenModal(true);
   };
@@ -55,9 +62,9 @@ const TileScreen = (props: TileScreenProps): ReactElement<TileScreenProps> => {
                   <div key={i} className="month-tile-container">
                     <h2 className="tile-screen-month-title">{month}</h2>
                     <div className="tile-container">
-                      {tiles[month].map((tile) => (
+                      {tiles[month].map((tile, index) => (
                         <MoodTile
-                          key={tile.id}
+                          key={index}
                           data={tile}
                           setModalContent={props.setModalContent}
                           setOpenModal={props.setOpenModal}

@@ -1,14 +1,43 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { ReactElement } from "react";
+import { ReactMediaRecorder, StatusMessages } from "react-media-recorder";
+import { addUserTile } from "../tools/firebaseTools";
+import { NoteType, TileDataRaw } from "../types";
 import "./AddTileModalContent.css";
 
 type AddTileModalContentProps = {
   setOpenModal: React.Dispatch<React.SetStateAction<boolean>>;
+  setAddTileRefresher: React.Dispatch<React.SetStateAction<number>>;
+  setModalContent: React.Dispatch<React.SetStateAction<JSX.Element>>;
+  addTileRefresher: number;
+  userID: string | undefined;
 };
 
-function AddTileModalContent(
+const VideoPreview = ({ stream }: { stream: MediaStream | null }) => {
+  const videoRef = useRef<HTMLVideoElement>(null);
+  useEffect(() => {
+    if (videoRef.current && stream) {
+      videoRef.current.srcObject = stream;
+    }
+  }, [stream]);
+  if (!stream) {
+    return null;
+  }
+  return (
+    <video
+      ref={videoRef}
+      autoPlay
+      controls={false}
+      className="nt-content-video"
+      width={350}
+      height={200}
+    />
+  );
+};
+
+const AddTileModalContent = (
   props: AddTileModalContentProps
-): ReactElement<AddTileModalContentProps> {
+): ReactElement<AddTileModalContentProps> => {
   const images = [
     "mood1.png",
     "mood2.png",
@@ -23,25 +52,56 @@ function AddTileModalContent(
     "Academics",
     "Family",
   ];
-  const colors = ["#ec2128", "#f35928", "#fcb03a", "#009348", "#21abe3"];
   const [selectedMood, setSelectedMood] = useState<number>(-1);
   const [selectedReason, setSelectedReason] = useState<number>(-1);
   const [stepNum, setStepNum] = useState<number>(1);
-  const [notesMethod, setNotesMethod] = useState<"Text" | "Video">("Text");
+  const [notesMethod, setNotesMethod] = useState<NoteType>("text");
+  const [isRecording, setIsRecording] = useState<boolean>(false);
+  const [videoStream, setVideoStream] = useState<string | undefined>();
+  const [textNotes, setTextNotes] = useState<string>("");
 
   const handleButton = () => {
     if (stepNum === 1) {
       setStepNum(2);
     } else {
-      props.setOpenModal(false);
+      if (props.userID) {
+        const data: TileDataRaw = {
+          date: new Date().toISOString(),
+          tileScore: selectedMood,
+          category: reasons[selectedReason],
+          textNote: textNotes,
+          videoNote: videoStream ? videoStream : "",
+          noteType: notesMethod,
+        };
+        addUserTile(props.userID, data)
+          .then((id) => {
+            console.log("Tile added: " + id);
+            props.setAddTileRefresher(props.addTileRefresher + 1);
+            props.setOpenModal(false);
+            setTimeout(() => {
+              props.setModalContent(<></>);
+            }, 300);
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+      }
     }
   };
 
   const checkValidInput = () => {
-    if (selectedMood !== -1 && selectedReason !== -1) {
-      return true;
+    if (stepNum === 1) {
+      if (selectedMood !== -1 && selectedReason !== -1) {
+        return true;
+      }
+      return false;
+    } else {
+      if (notesMethod === "text") {
+        return textNotes !== "";
+      } else {
+        return videoStream;
+      }
     }
-    return false;
   };
 
   const getStep1Content = () => {
@@ -54,12 +114,14 @@ function AddTileModalContent(
           <div className="mood-images-container">
             {images.map((image, index) => (
               <img
+                key={index}
                 className={
-                  "mood-image" + (index === selectedMood ? " selected" : "")
+                  "mood-image" +
+                  (index === selectedMood / 2 - 1 ? " selected" : "")
                 }
                 src={require(`../assets/${image}`)}
                 alt="mood"
-                onClick={() => setSelectedMood(images.indexOf(image))}
+                onClick={() => setSelectedMood((images.indexOf(image) + 1) * 2)}
               />
             ))}
           </div>
@@ -76,6 +138,7 @@ function AddTileModalContent(
                   "reason-option" +
                   (index === selectedReason ? " selected" : "")
                 }
+                key={index}
                 onClick={() => setSelectedReason(reasons.indexOf(reason))}
               >
                 {reason}
@@ -85,6 +148,31 @@ function AddTileModalContent(
         </div>
       </>
     );
+  };
+
+  const getVideoRenderComponent = (
+    status: StatusMessages,
+    previewStream: MediaStream | null,
+    mediaBlobUrl: string | undefined
+  ) => {
+    if (status === "idle") {
+      return;
+    } else if (status === "recording") {
+      return <VideoPreview stream={previewStream} />;
+    } else if (status === "stopped") {
+      setVideoStream(mediaBlobUrl);
+      return (
+        <video
+          src={mediaBlobUrl}
+          controls
+          autoPlay
+          loop
+          className="nt-content-video"
+          width={350}
+          height={200}
+        />
+      );
+    }
   };
 
   const getStep2Content = () => {
@@ -98,18 +186,25 @@ function AddTileModalContent(
             <p
               className={
                 "nt-content-notes-option" +
-                (notesMethod === "Text" ? " selected" : "")
+                (notesMethod === "text" ? " selected" : "")
               }
-              onClick={() => setNotesMethod("Text")}
+              onClick={() => {
+                setNotesMethod("text");
+                setIsRecording(false);
+                setVideoStream(undefined);
+              }}
             >
               Text
             </p>
             <p
               className={
                 "nt-content-notes-option" +
-                (notesMethod === "Video" ? " selected" : "")
+                (notesMethod === "video" ? " selected" : "")
               }
-              onClick={() => setNotesMethod("Video")}
+              onClick={() => {
+                setNotesMethod("video");
+                setTextNotes("");
+              }}
             >
               Video
             </p>
@@ -117,10 +212,49 @@ function AddTileModalContent(
         </div>
         <div className="nt-content-container-item">
           <h2 className="nt-content-container-title">Describe your day</h2>
-          {notesMethod === "Text" ? (
-            <textarea className="nt-content-notes-textarea" />
+          {notesMethod === "text" ? (
+            <textarea
+              className="nt-content-notes-textarea"
+              value={textNotes}
+              onChange={(e) => setTextNotes(e.target.value)}
+            />
           ) : (
-            <div className="nt-content-notes-video-container"></div>
+            <ReactMediaRecorder
+              video
+              render={({
+                startRecording,
+                stopRecording,
+                mediaBlobUrl,
+                previewStream,
+                status,
+              }) => (
+                <div className="nt-content-notes-video-container">
+                  <>
+                    <div className="nt-content-video-options">
+                      <button
+                        className="nt-content-video-option"
+                        onClick={() => {
+                          if (!isRecording) {
+                            startRecording();
+                            setIsRecording(true);
+                          } else {
+                            stopRecording();
+                            setIsRecording(false);
+                          }
+                        }}
+                      >
+                        {`${isRecording ? "Stop" : "Start"} Recording`}
+                      </button>
+                    </div>
+                    {getVideoRenderComponent(
+                      status,
+                      previewStream,
+                      mediaBlobUrl
+                    )}
+                  </>
+                </div>
+              )}
+            />
           )}
         </div>
       </>
@@ -140,6 +274,6 @@ function AddTileModalContent(
       </div>
     </>
   );
-}
+};
 
 export default AddTileModalContent;

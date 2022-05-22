@@ -2,6 +2,7 @@ import React from "react";
 import "./MoodTile.css";
 import { ReactElement } from "react";
 import { TileData } from "../types";
+import moment from "moment";
 
 type MoodTileProps = {
   data: TileData;
@@ -10,17 +11,10 @@ type MoodTileProps = {
 };
 
 const MoodTile = (props: MoodTileProps): ReactElement<MoodTileProps> => {
+  const colors = ["#ec2128", "#f35928", "#fcb03a", "#009348", "#21abe3"];
   const getBackgroundColor = (): string => {
     const { tileScore } = props.data;
-    if (tileScore < 3) {
-      return "#f54336";
-    } else if (tileScore < 5) {
-      return "#ff981f";
-    } else if (tileScore < 7) {
-      return "#ffd300";
-    } else {
-      return "#8bc255";
-    }
+    return colors[tileScore / 2 - 1];
   };
 
   const handleTileClick = () => {
@@ -37,7 +31,10 @@ const MoodTile = (props: MoodTileProps): ReactElement<MoodTileProps> => {
       className="mood-tile"
       onClick={handleTileClick}
       style={{ backgroundColor: getBackgroundColor() }}
-    ></div>
+    >
+      {props.data.tileScore}
+      {/* {moment(props.data.date).format("D")} */}
+    </div>
   );
 };
 

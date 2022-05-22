@@ -48,11 +48,6 @@
   transition: all 0.25s ease;
 }
 
-.tile-container:hover {
-  -webkit-box-shadow: 0px 0px 40px 8px rgba(120, 122, 141, 0.07);
-  box-shadow: 0px 0px 40px 8px rgba(120, 122, 141, 0.07);
-}
-
 .month-tile-container {
   display: flex;
   flex-direction: row;

@@ -1,1 +1,2 @@
 NLP_MODEL_PATH = './models/sentiment140-bert'
+ASSEMBLYAI_API_KEY = 'ef7c3695938846769b135bb3757d9367'

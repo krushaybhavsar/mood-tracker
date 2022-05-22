@@ -7,6 +7,7 @@ import PhoneInput from "react-phone-number-input";
 
 type LoginModalContentProps = {
   setOpenModal: React.Dispatch<React.SetStateAction<boolean>>;
+  setModalContent: React.Dispatch<React.SetStateAction<JSX.Element>>;
 };
 
 const LoginModalContent = (
@@ -53,6 +54,9 @@ const LoginModalContent = (
         .then(() => {
           console.log("Logged in successfully");
           props.setOpenModal(false);
+          setTimeout(() => {
+            props.setModalContent(<></>);
+          }, 300);
         })
         .catch((error: any) => {
           console.log(error);
