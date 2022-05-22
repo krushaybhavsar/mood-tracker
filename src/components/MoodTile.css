@@ -23,13 +23,14 @@
   justify-content: center;
 }
 
-.mood-tile-active h1 {
+.mood-tile-modal-content > h1 {
   font-size: 36px;
-  font-weight: bold;
+  font-weight: normal;
+  margin: 0;
   margin-top: 5px;
 }
 
-.mood-tile-active h2 {
+.mood-tile-modal-content > h2 {
   font-size: 20px;
   font-weight: bold;
   width: auto;
@@ -38,7 +39,7 @@
   padding: 30px;
 }
 
-.mood-tile-active h3 {
+.mood-tile-modal-content > h3 {
   font-size: 24px;
   font-weight: normal;
   margin: 24px;
