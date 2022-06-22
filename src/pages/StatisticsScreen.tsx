@@ -52,44 +52,6 @@ const StatisticsScreen = (
     }
   };
 
-  const data = [
-    {
-      name: "Page A",
-      uv: 4000,
-      pv: 2400,
-    },
-    {
-      name: "Page B",
-      uv: 3000,
-      pv: 1398,
-    },
-    {
-      name: "Page C",
-      uv: 2000,
-      pv: 9800,
-    },
-    {
-      name: "Page D",
-      uv: 2780,
-      pv: 3908,
-    },
-    {
-      name: "Page E",
-      uv: 1890,
-      pv: 4800,
-    },
-    {
-      name: "Page F",
-      uv: 2390,
-      pv: 3800,
-    },
-    {
-      name: "Page G",
-      uv: 3490,
-      pv: 4300,
-    },
-  ];
-
   const getLineChartData = (tilesD: TileDataList): any[] => {
     const data: any[] = [];
     for (const tileList of Object.values(tilesD)) {
@@ -135,23 +97,6 @@ const StatisticsScreen = (
         <div className="stat-container">
           <div className="stat-graph">
             <h1 className="stat-header">Your Mood Over Time</h1>
-            {/* <LineChart
-              width={730}
-              height={350}
-              data={lineChartData}
-              margin={{ top: 5, right: 70, left: 20, bottom: 20 }}
-            >
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis
-                type="category"
-                dataKey={"Date"}
-                style={{ fontSize: "10px" }}
-              />
-              <YAxis type="number" domain={[0, 10]} />
-              <Tooltip />
-              <Legend />
-              <Line type="monotone" dataKey="Tile Score" stroke="#4766f9" />
-            </LineChart> */}
 
             <AreaChart
               width={730}
@@ -173,7 +118,7 @@ const StatisticsScreen = (
               </defs>
               <XAxis dataKey="Date" tick={false} />
               <YAxis type="number" domain={[0, 10]} />
-              <Tooltip cursor={false}/>
+              <Tooltip cursor={false} />
               <Area
                 type="monotone"
                 dataKey="Tile Score"
@@ -186,19 +131,27 @@ const StatisticsScreen = (
 
           <div className="stat-graph">
             <h1 className="stat-header">How is Your Mood Effected?</h1>
-            <BarChart width={730} height={300} data={barChartData} onMouseEnter={() => {}}
-            margin={{ top: 10, right: 60, left: 10, bottom: 15 }}
+            <BarChart
+              width={730}
+              height={300}
+              data={barChartData}
+              onMouseEnter={() => {}}
+              margin={{ top: 10, right: 60, left: 10, bottom: 15 }}
             >
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="Category" />
               <YAxis type="number" domain={[0, 10]} />
-              <Tooltip cursor={{fill: 'transparent'}}/>
+              <Tooltip cursor={{ fill: "transparent" }} />
               <Bar dataKey="Tile Score" fill="#4766f9" />
             </BarChart>
           </div>
         </div>
       ) : (
         <div className="screen-login">
+          <img
+            src={require("../assets/mindboard-bg.png")}
+            className="login-img"
+          />
           <h1>Login to view your statistics and behavioral patterns!</h1>
         </div>
       )}

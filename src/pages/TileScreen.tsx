@@ -85,6 +85,10 @@ const TileScreen = (props: TileScreenProps): ReactElement<TileScreenProps> => {
         </>
       ) : (
         <div className={"screen-login"}>
+          <img
+            src={require("../assets/mindboard-bg.png")}
+            className="login-img"
+          />
           <h1>Login to view your board and add entries!</h1>
         </div>
       )}
