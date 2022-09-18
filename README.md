@@ -1,3 +1,13 @@
+<p>🥇 Project received <b>1st place</b> in the Mental Health Category of the High Tech Hacks 2022 Hackathon</p>
+<p>🥇 Project received <b>1st place</b> overall in the PantherHacks 2022 Hackathon</p>
+<p>🏆 Project received the <b>Wolfram Alpha Award</b></p>
+
+Created by Krushay Bhavsar and Ayush Agarwal
+
+## Demo and Explanatory Video
+### https://www.youtube.com/watch?v=7KXf8PHqCNA
+[![Demo and Explanatory Video](https://img.youtube.com/vi/7KXf8PHqCNA/0.jpg)](https://www.youtube.com/watch?v=7KXf8PHqCNA)
+
 ## Inspiration
 
 Mental health disorders are a global issue. Just in the United States, almost 1 out of every 4 adults suffers from a mental health disorder. To tackle the issue of mental health, we created Mind Board, a virtual dashboard where users can monitor their mental health through the use of deep learning and statistical analysis to help them make informed decisions on how to improve their mental health. This not only helps people be more aware of themselves and what issues affect them but also provides them with a neat and organized way of doing so.
