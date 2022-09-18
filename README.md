@@ -1,5 +1,5 @@
 <p>🥇 Project received <b>1st place</b> in the Mental Health Category of the High Tech Hacks 2022 Hackathon</p>
-<p>🥇 Project received <b>1st place</b> overall in the PantherHacks 2022 Hackathon</p>
+<p>🥇 Project received <b>1st place</b> as Best Web Hack of the PantherHacks 2022 Hackathon</p>
 <p>🏆 Project received the <b>Wolfram Alpha Award</b></p>
 
 Created by Krushay Bhavsar and Ayush Agarwal
